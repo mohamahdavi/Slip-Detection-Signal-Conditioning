@@ -26,10 +26,6 @@ The goal is to design and simulate an analog signal conditioning circuit that pr
 - **MATLAB** – System modelling, slip detection algorithm, GUI
 - **LaTeX** – Report writing
 
-## Status
-- **Phase 1** (current): Sensor selection, circuit design, simulation, validation, and system‑level modelling.  
-- **Phase 2** (planned): Hardware implementation, microcontroller programming, and real‑time testing.
-
 ## Authors
 - Mohammad Mahdi Barzegar
 - Mohammad Reza Mahdavi
