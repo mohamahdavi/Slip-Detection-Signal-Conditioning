@@ -31,5 +31,5 @@ The goal is to design and simulate an analog signal conditioning circuit that pr
 - Mohammad Reza Mahdavi
 - Mohammad Moein Abolfathi
 
-*Course: Sensing, Instrumentation & Measurement Systems*  
-*Date: [Month Year]*
+Course: Sensing, Instrumentation & Measurement Systems - Prof. Jahed - Electrical Engineering Department, Sharif University of Technology
+Date: February 2026
