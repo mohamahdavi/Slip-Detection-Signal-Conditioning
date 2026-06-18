@@ -1,0 +1,450 @@
+\documentclass[12pt,a4paper]{article}
+
+% Main packages
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{circuitikz}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\sisetup{detect-all=true}
+
+% Encoding and fonts
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Page settings
+\linespread{1.3}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\title{Design of a Signal Conditioning System for a Two-Jaw Robotic Gripper with Slip Detection}
+\author{Mohammad Mahdi Barzegar \and Mohammad Reza Mahdavi \and Mohammad Moein Abolfathi}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% Add Sharif logo and department below the authors
+\vspace{0.5cm}
+\begin{center}
+    \includegraphics[width=3cm]{sharif.png}\\[0.3cm]
+    {\large \textbf{Electrical Engineering Department, Sharif University of Technology}}
+\end{center}
+\vspace{0.5cm}
+
+\newpage
+
+
+% Image and abstract on the same page
+\vspace*{\fill}
+\begin{center}
+    \includegraphics[width=0.4\textwidth]{ai_before_abstract.png}
+\end{center}
+
+%----------------------------------
+% Abstract
+%----------------------------------
+\begin{abstract}
+In this project, a signal conditioning system for a two‑jaw robotic gripper with slip detection capability is designed and simulated. The slip signal is acquired from a suitable sensor, amplified, filtered, and prepared for processing and detection of abnormal conditions. First, the characteristics of the slip signal (amplitude and frequency range) are studied, and the required specifications for the analog circuit are determined. Subsequently, the design of the preamplifier and filters is carried out together with the necessary calculations, and the complete circuit is simulated in LTspice. The simulation results include time‑ and frequency‑domain responses of different circuit stages, the circuit’s behaviour in the presence of noise, and its performance in detecting abnormal slip conditions. Strengths and limitations of the design are summarised, and the implementation of analog‑to‑digital and digital‑to‑analog conversion for future system expansion, as well as system‑level modelling, digital processing, and a graphical user interface in MATLAB, are discussed.
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+\newpage
+
+%----------------------------------
+% 1) Introduction
+%----------------------------------
+\section{Introduction}
+
+\subsection*{Subject of the acquisition system and its importance}
+The goal of this project is to design and simulate a signal conditioning circuit for a two‑jaw robotic gripping system whose primary task is to detect “slip during grasping”. Timely and accurate slip detection is essential to prevent dropping objects, reduce damage to the part being handled, and improve the safety and reliability of the robotic system. Without slip detection, the robot cannot appropriately adjust the gripping force; consequently, both the risk of releasing the object and the risk of applying excessive force and damaging the object increase.
+
+\subsection*{Applications and existing systems}
+Slip detection systems are widely used in intelligent prosthetic hands, service robots, and industrial robots. In such systems, transducers such as piezoelectric sensors, capacitive sensors, or force‑sensing resistors (FSR) are commonly employed to detect rapid changes in contact force and friction. These sensors capture the dynamic variations in force, enabling the detection of incipient slip and a fast reaction by the controller. Existing implementations typically include a signal conditioning chain (preamplifier, appropriate band‑pass filters, and noise‑rejection circuits), an analog‑to‑digital converter, and a controller that adjusts the gripping force based on the processed signal.
+
+\subsection*{What we do in this project}
+In this project, a suitable sensor for slip detection is first selected. According to the characteristics of its output signal (amplitude and frequency range), the preamplifier and filter circuits are designed. Then, the frequency and time responses of the circuit are extracted in LTspice, and its performance in the presence of noise and abnormal conditions (such as sudden force changes or severe slip) is evaluated. Furthermore, to complete the signal acquisition chain, the stages of analog‑to‑digital (A/D) and, if necessary, digital‑to‑analog (D/A) conversion are conceptually examined and simulated. Finally, the results are summarised and the project presentation is prepared.
+
+\subsection*{How information is presented in this report}
+The report is organised as follows. In the next section, the background of the design, including the measurand specifications, slip signal characteristics, and the requirements for the analog circuit, is explained. The “Project methodology” section then presents the details of the conditioning circuit design, including hand calculations, component selection, and implementation in the LTspice simulation environment, along with a neat schematic of the final circuit. In the simulation results section, the circuit responses under different conditions and its ability to detect abnormal situations are examined. Finally, the project is summarised, strengths and weaknesses are discussed, and suggestions for future development are provided.
+
+% =========================
+% 2) Background and system specifications
+% =========================
+\section{Background and system specifications}
+\label{sec:background}
+
+\subsection{Selection of a piezoelectric sensor}
+Slip is inherently a dynamic process that generates high‑frequency mechanical vibrations. On the other hand, piezoelectric materials produce an electric charge only in response to varying mechanical stress; therefore, these sensors intrinsically behave like a high‑pass filter. This characteristic eliminates static forces and pressures (such as the constant holding force of the gripper) and reveals only the tiny vibrations caused by slip.
+
+Nevertheless, using a single piezoelectric sensor poses challenges. A single sensor behaves similarly to a microphone and merely reports the presence of vibration; consequently, distinguishing slip‑induced vibrations from disturbing vibrations (e.g., noise from the robot's motors) becomes difficult. To overcome this problem and to accurately track the slip wave across the contact surface (robot skin), this project uses a matrix array of piezoelectric sensors with an engineered placement on the gripper jaws.
+
+\subsection{Sensor specifications and general considerations}
+Based on the physical characteristics of the slip phenomenon and standard sensor datasheets, the following specifications for the sensor and input signal are assumed:
+\begin{itemize}
+    \item \textbf{Sensor sensitivity:} $50 \, \text{pC/N}$
+    \item \textbf{Useful frequency band:} $1 \, \text{Hz}$ to $1 \, \text{kHz}$
+    \item \textbf{Sensor output voltage (AC):} approximately $\pm 1 \, \text{mV}$
+\end{itemize}
+The design objective is to amplify this tiny signal around a DC level of 2 V (compatible with analog‑to‑digital converters) so that the final output fluctuates between $1.9 \, \text{V}$ and $2.1 \, \text{V}$.
+
+% =========================
+% 3) Project methodology and hand calculations
+% =========================
+\section{Project methodology and hand calculations}
+\label{sec:calculations}
+
+In this section, the design process of the signal conditioning circuit, including amplifier calculations, component selection, and filter design, is presented.
+
+\subsection{Required voltage and gain calculations}
+Assuming an equivalent capacitance of $C = 150 \, \text{nF}$ for the piezoelectric sensor and a generated charge $q = 1.5 \times 10^{-10} \, \text{C}$, the output voltage of the sensor is calculated as follows:
+\begin{equation}
+    |V_{\text{out}}| = \frac{q}{C} = \frac{1.5 \times 10^{-10}}{150 \times 10^{-9}} = 1 \, \text{mV}
+\end{equation}
+Since the desired output swing of the amplifier stage is $\pm 0.1 \, \text{V}$, the total voltage gain must be set to:
+\begin{equation}
+    A_v = \frac{V_{\text{out,ac}}}{V_{\text{in,ac}}} = \frac{0.1 \, \text{V}}{1 \, \text{mV}} = 100
+\end{equation}
+
+\subsection{Selection of the operational amplifier (Op‑Amp)}
+Modelling of the piezoelectric sensor shows that it has a very high output impedance, and a significant current cannot be drawn from it. Therefore, the input stage of the amplifier must have a very high input impedance. For this reason, amplifiers with JFET inputs, which have negligible bias current, are used.
+When comparing available models, the offset voltage must be considered; applying a gain of 100 may lead to output saturation and a reduction of the dynamic range. Based on these criteria, a suitable op‑amp is selected.
+
+\subsection{Filter design}
+To eliminate noise and extract the pure slip signal, the following frequency filters are essential:
+
+\subsubsection{Band‑pass filter (BPF)}
+Given that the slip signal frequency range lies between $1 \, \text{Hz}$ and $1 \, \text{kHz}$, a passive band‑pass filter is used to remove frequencies outside this band and prevent noise amplification. The component calculations are as follows:
+\begin{align}
+    f_L &= 1 \, \text{Hz} = \frac{1}{2\pi R_L C_L} \implies
+    \begin{cases}
+    R_L = 1.6 \, \text{k}\Omega \\
+    C_L = 100 \, \mu\text{F}
+    \end{cases} \\[10pt]
+    f_H &= 1 \, \text{kHz} = \frac{1}{2\pi R_H C_H} \implies
+    \begin{cases}
+    R_H = 160 \, \text{k}\Omega \\
+    C_H = 1 \, \text{nF}
+    \end{cases}
+\end{align}
+
+\subsubsection{Notch filter for mains hum elimination}
+Powering the circuit through $V_{cc}$ and $V_{ee}$ can inject 50 Hz mains hum into the system. To remove this component, a notch filter with a centre frequency of 50 Hz is designed. Unlike the band‑pass filter, this filter is placed after the amplification stages. The calculated values for this filter are:
+\begin{equation}
+    f_{\text{notch}} = 50 \, \text{Hz} \implies R = 10 \, \text{k}\Omega \; , \; C = 160 \, \text{nF}
+\end{equation}
+
+\subsection{Differential amplifier design and CMRR analysis}
+To achieve the desired differential gain ($A_{vd} = 100$), a differential amplifier structure is used. The output equation of this configuration is:
+\begin{equation}
+    V_{\text{out+}} = \varepsilon \left( \frac{R_4}{R_3} \right) V_{\text{CM}}
+          + V_{\text{diff}} \frac{R_4}{R_3} \left( 1 + \frac{2 R_2}{R_1} \right)
+\end{equation}
+Substituting the gain of 100 and choosing resistor ratios yields:
+\begin{equation}
+    A_{vd} = 100 \implies \frac{R_4}{R_3} = 10 \quad \text{and} \quad 1 + \frac{2 R_2}{R_1} = 9
+\end{equation}
+With standard resistor values, the following design is obtained:
+\begin{equation}
+    \begin{cases}
+    R_4 = 10 \, \text{k}\Omega \\
+    R_3 = 1 \, \text{k}\Omega \\
+    R_2 = 90 \, \text{k}\Omega \\
+    R_1 = 2 \, \text{k}\Omega
+    \end{cases}
+\end{equation}
+
+To investigate the effect of resistor mismatch on the common‑mode rejection ratio (CMRR), a resistor tolerance of 1\% is assumed. The mismatch coefficient ($\epsilon$) is obtained as:
+\begin{equation}
+    \epsilon_{\text{max}} = \frac{1.01 \times 1.01}{0.99 \times 0.99} - 1 \approx 0.0408
+\end{equation}
+This value is a realistic assumption for the mismatch coefficient. Substituting this value, the CMRR is calculated as:
+\begin{equation}
+    V_{\text{out}} = 10 \, \varepsilon \, V_{\text{CM}} + 0.1 \implies \text{CMRR} =10 \log_{10} \left( \frac{100}{10 \times \varepsilon} \right) \approx 23.9 \, \text{dB}
+\end{equation}
+
+\textbf{Design note:} In all stages connecting different blocks (from the sensor to the filter and amplifier), a buffer circuit (voltage follower) is used to prevent loading effects between stages.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.9\textwidth]{schematic.jpg}
+\caption{General components of the designed circuit}
+\label{fig:schematic}
+\end{figure}
+
+% =========================
+% 4) Simulation results
+% =========================
+\section{Simulation results in LTspice}
+\label{sec:simulation}
+
+In this section, the circuit designed based on theoretical calculations is simulated in LTspice, and the performance of its various parts is evaluated. To align the simulation with reality, equivalent commercial components are used; for instance, given the similarity of the required specifications (such as JFET input and negligible bias current), the TL071 op‑amp model was employed.
+
+\subsection{Modelling of the piezoelectric sensor and noise sources}
+To model the piezoelectric sensor, its output is considered as a voltage source with a $1 \, \text{mV}$ amplitude. To examine the circuit's performance under real conditions and in noisy industrial environments, several noise sources with relatively high amplitudes (to create the most challenging conditions) are summed with the main signal. These noises include:
+\begin{itemize}
+    \item Mains hum at $50 \, \text{Hz}$.
+    \item Low‑frequency noise (slow variations) around $0.1 \, \text{Hz}$.
+    \item High‑frequency noise from radio‑frequency and satellite interference (RF).
+    \item Miscellaneous noise at intermediate frequencies.
+\end{itemize}
+For simplicity of analysis, it is assumed that the useful slip signal consists of two sinusoidal waves at $100 \, \text{Hz}$ and $800 \, \text{Hz}$. A buffer stage (voltage follower) is placed at the sensor model output to prevent voltage drop (Figures \ref{fig:piezo_model} and \ref{fig:piezo_out}).
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{PiezoElectricModel.jpg}
+        \caption{Model of the piezoelectric sensor and combined noise sources.}
+        \label{fig:piezo_model}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{PiezoElectricModelOutput.jpg}
+        \caption{Sensor output signal (heavily noisy).}
+        \label{fig:piezo_out}
+    \end{minipage}
+\end{figure}
+
+\subsection{Band‑pass filter stage (BPF)}
+After passing through the input buffer, the signal enters the passive band‑pass filter. As seen in Figure \ref{fig:filter_out}, the filter has managed to remove most of the high‑ and low‑frequency noise, and the signal is largely cleaned up; however, the 50 Hz mains hum, which is close to the pass‑band, is still visible in the signal.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{BufferAndFilter.jpg}
+        \caption{Input buffer and band‑pass filter circuit.}
+        \label{fig:buffer_filter}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{FilterOutput.jpg}
+        \caption{Output of the band‑pass filter (most noise removed except 50 Hz).}
+        \label{fig:filter_out}
+    \end{minipage}
+\end{figure}
+
+\subsection{First instrumentation amplifier stage and notch filter}
+The filtered signal enters an instrumentation amplifier with a theoretical gain of 100 (Figure \ref{fig:ina1}). The output of this stage shows that the signal has been successfully amplified (Figure \ref{fig:ina1_out}).
+After the initial amplification, to remove the detrimental 50 Hz noise that passed through the previous filter, the signal is fed to a notch filter with a centre frequency of 50 Hz (Figures \ref{fig:notch} and \ref{fig:notch_out}).
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{InstrumentaionCircuit.jpg}
+        \caption{Instrumentation amplifier circuit (first stage).}
+        \label{fig:ina1}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{InstrumentaionCircuitOutput.jpg}
+        \caption{Output of the first amplifier stage.}
+        \label{fig:ina1_out}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{NotchFilter.jpg}
+        \caption{Notch filter circuit for 50 Hz elimination.}
+        \label{fig:notch}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{NotchFilterOutput.jpg}
+        \caption{Output of the notch filter (complete removal of mains hum).}
+        \label{fig:notch_out}
+    \end{minipage}
+\end{figure}
+
+\subsection{Compensation of gain loss with a second amplifier stage}
+By examining the results up to this point, it was found that due to the use of passive filters, the signal suffers a voltage drop (attenuation) – a factor that was overlooked in the initial hand calculations. Consequently, despite applying a gain of 100 in the first stage, the signal amplitude only reaches about $0.3 \, \text{V}$, which is insufficient to drive an analog‑to‑digital converter.
+To compensate for this loss, another instrumentation amplifier stage, completely identical to the first, was added to the circuit. In this stage, to achieve a gain of 300, the corresponding resistor was changed from $10 \, \text{k}\Omega$ to $30 \, \text{k}\Omega$. The output of this stage is shown in Figure \ref{fig:ina2_out}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{AfterSecondInstrumentationOutput.jpg}
+    \caption{Circuit output after the second amplifier stage (gain loss compensated).}
+    \label{fig:ina2_out}
+\end{figure}
+
+\subsection{DC level adjustment and final conditioning circuit}
+According to the initial objective, the final signal must fluctuate around a DC voltage of 2 V to be ready for reading by a microcontroller. To optimise power consumption and reduce hardware costs (avoiding the purchase of a separate regulator or power supply), the same 5 V power supply of the circuit was used. By using a simple voltage divider (with a resistor such as $R_2' = 3 \, \text{k}\Omega$), the required offset voltage was provided and summed with the signal. The aggregated final circuit and its time‑domain output are shown in Figures \ref{fig:final_circuit} and \ref{fig:final_out}.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{AmayeshCircuit.jpg}
+        \caption{Complete and aggregated schematic of the signal conditioning circuit.}
+        \label{fig:final_circuit}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{AmayeshCircuitOutput.jpg}
+        \caption{Final circuit output in time domain, sitting on a 2 V offset.}
+        \label{fig:final_out}
+    \end{minipage}
+\end{figure}
+
+\subsection{Overall frequency response of the system}
+Finally, to confirm the frequency behaviour of the designed system, an AC analysis was performed in the software. As evident from the frequency response (Figure \ref{fig:freq_response}), the system acts as a well‑behaved band‑pass filter in the target frequency range ($1 \, \text{Hz}$ to $1 \, \text{kHz}$) and provides the necessary amplification; the deep dip at 50 Hz demonstrates the excellent performance of the notch filter in eliminating mains hum.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{AmayeshCircuitOutputFrequency.jpg}
+    \caption{Final frequency response of the entire conditioning circuit.}
+    \label{fig:freq_response}
+\end{figure}
+
+% =========================
+% 5) Examination of abnormal conditions and noise factors
+% =========================
+\section{Examination of abnormal conditions and noise factors}
+\label{sec:abnormalities}
+
+In this section, conditions that deviate from the normal operation of the conditioning circuit and could challenge the accuracy of slip detection are investigated. These conditions are divided into two general categories: disturbing factors (external noise) and changes in system conditions (abnormal operational states).
+
+\subsection{Category 1: Disturbing factors (electromagnetic interference – EMI)}
+One of the main challenges in robotic arms is the physical proximity of sensors to electric motors. The high switching currents in motor drivers (especially PWM signals) generate interfering electromagnetic fields (EMI). Since the output of the piezoelectric sensor has a very high impedance, these noises are easily induced onto the signal lines and appear as spikes or high‑frequency noise in the signal. The sharp edges of these noises can be mistaken for real slip vibrations and lead to false positive detections.
+
+\textbf{Proposed solution:} To counter this phenomenon, an instrumentation amplifier with a high common‑mode rejection ratio (CMRR) was used in the circuit design to reject induced noises that appear as common‑mode signals. Moreover, to further improve the system in a hardware implementation, a low‑pass filter (LPF) with a cutoff frequency around $1 \, \text{kHz}$ can be added at the end of the circuit to completely filter out high‑frequency switching noises that lie outside the slip frequency range.
+
+\subsection{Category 2: Changes in system conditions (saturation due to mechanical shock)}
+During an object‑grasping operation, the robot hand may suddenly collide with a hard obstacle, or due to a control system error, an excessive force may be applied to the object. In this situation (mechanical shock), an intense physical stress is imposed on the piezoelectric sensor, generating a voltage far beyond the millivolt range that was predicted.
+This phenomenon causes the outputs of the op‑amps in the conditioning circuit to reach the positive or negative supply rails ($V_{cc}$ or ground) – clipping. In this state, the output signal, instead of displaying slip fluctuations, appears as a flat line at the saturation voltage, and slip information is essentially lost.
+
+\textbf{Detection solution:} To detect this abnormal condition at the hardware level, a window comparator circuit can be used. This circuit compares the final output voltage with two threshold levels (e.g., $0.5 \, \text{V}$ and $4.5 \, \text{V}$). If the voltage falls outside this window, an interrupt signal (digital) is sent to the microcontroller so that the “saturation/impact” status is reported, and the system disregards the invalid data at that moment.
+
+% =========================
+% 6) Simulation of A/D and D/A converters
+% =========================
+\section{A/D and D/A converters}
+\label{sec:adc_dac}
+
+In a real robotic gripping system, an array of piezoelectric sensors is used at different points on the contact surface. The digitised data from these sensors are analysed by control algorithms (such as voting and averaging) to issue commands to increase or decrease the gripping force. However, in this project, the main focus is on designing and simulating the conditioning circuit for a single sensor channel.
+
+Since the ADC0808 model was not available in LTspice, and in PSpice only a graphical schematic without simulation capability existed, the simulation of this section was performed in PSpice using substitute models.
+
+\subsection{Simulation of the analog‑to‑digital converter (ADC)}
+For this simulation, the ADC10Break component (10‑bit converter) was used. By configuring the circuit so that the two least significant bits (bits 9 and 10) effectively have no influence on the calculations, the behaviour of an 8‑bit converter (similar to the ADC0808) was approximated. The voltage resolution in this case, given the reference voltage, is calculated as follows:
+\begin{equation}
+    \Delta V = \frac{2.2}{2^{10}} \approx 2.15 \, \text{mV}
+\end{equation}
+It should be noted that if a real 8‑bit converter were used, the reference voltage ($V_{\text{ref}}$) would need to be calibrated so that the threshold levels match. The schematic of this circuit and its digital bit outputs are shown in Figures \ref{fig:adc_circuit} and \ref{fig:adc_bits}.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{ADFigure.jpg}
+        \caption{Simulation circuit of the analog‑to‑digital converter (A/D).}
+        \label{fig:adc_circuit}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{ADFigureEachBitsOutput.jpg}
+        \caption{Digital output (various bits) from the A/D converter.}
+        \label{fig:adc_bits}
+    \end{minipage}
+\end{figure}
+
+\subsection{Simulation of the digital‑to‑analog converter (DAC)}
+In a hardware implementation, the DAC is usually placed after the microcontroller; however, since microcontroller programming is not within the scope of this project, in the simulation the output of the ADC was directly connected to the input of the DAC10Break component (as a substitute for the DAC0808) to examine signal reconstruction (Figure \ref{fig:dac_circuit}).
+
+As can be seen in Figure \ref{fig:dac_out}, the reconstructed signal has a strongly staircase nature. This phenomenon is due to two simulation limitations:
+\begin{enumerate}
+    \item \textbf{Voltage range mismatch:} The analog output signal from the conditioning circuit lies in the range $1.8 \, \text{V}$ to $2.2 \, \text{V}$. If it were possible to precisely set the lower limit of the reference voltage in the simulation component, all bit levels would be allocated to this range, and the resolution would be greatly improved.
+    \item \textbf{Sample rate:} At this stage, a sampling frequency of $5 \, \text{kHz}$ was considered, which appears insufficient for accurate signal reconstruction.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{DAFigure.jpg}
+        \caption{Circuit connecting the ADC to the digital‑to‑analog converter (D/A).}
+        \label{fig:dac_circuit}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{DAOutput.jpg}
+        \caption{Reconstructed analog signal at a sample rate of $5 \, \text{kHz}$.}
+        \label{fig:dac_out}
+    \end{minipage}
+\end{figure}
+
+To overcome the second limitation and prove the system's functionality, the sample rate was increased to $50 \, \text{kHz}$. As seen in Figure \ref{fig:adc_fast}, with the increased sample rate, the quality of the reconstructed signal improved dramatically, and the behaviour of the original signal was well recovered.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{ADCOutputAfterSampleRateChange.jpg}
+    \caption{Improved reconstructed signal after increasing the sample rate to $50 \, \text{kHz}$.}
+    \label{fig:adc_fast}
+\end{figure}
+
+% =========================
+% 7) System modelling, digital processing, and GUI in MATLAB
+% =========================
+\section{System modelling, digital processing, and graphical user interface}
+\label{sec:system_modeling_matlab}
+
+After designing and simulating the analog conditioning circuit, to evaluate the system's performance in a real‑world environment, the entire signal chain – sensor, conditioning, A/D converter, and control algorithm – was implemented in MATLAB as a system‑level model.
+
+\subsection{Generating an artificial signal and simulating the A/D converter}
+To this end, the behaviour of the piezoelectric sensor during slip was first mathematically modelled. The generated signals are in the millivolt range, and environmental noise was added to them. The effect of the conditioning circuit (amplification with a gain of 100 and the addition of a $2.5 \, \text{V}$ offset) was then applied. The output of this block was fed into an 8‑bit ADC simulator with a $5 \, \text{V}$ reference voltage to impose the effect of digital quantisation with a resolution of $19.6 \, \text{mV}$ on the signal.
+
+\subsection{Control algorithm and slip detection}
+The microcontroller's task is to monitor deviations of the signal from the offset voltage level ($2.5 \, \text{V}$). In the written algorithm, the absolute value of the difference between the digital voltage and the offset level is computed. If this value exceeds a specified threshold, the controller detects the onset of slip and sends a command signal (High) to the motor driver to increase the gripping force. To prevent rapid toggling of the motors, a debounce/hold algorithm was implemented to ensure stable motor commands.
+
+\subsection{Graphical user interface and sensitivity calibration}
+To display the real‑time behaviour of the system, a graphical user interface (GUI) was developed in MATLAB, which performs the following tasks:
+\begin{itemize}
+    \item \textbf{Real‑time monitoring:} Simultaneous plotting of the raw sensor signal, the digitised signal, and the controller output command to monitor the gripper behaviour.
+    \item \textbf{Software calibration:} Given differences in object material and weight, the operator can change the “threshold voltage” value via the GUI. This capability allows the system to be easily calibrated for rough or soft objects, minimising false detection errors.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{matlabfigure.png}
+    \caption{User interface, signal monitoring, and gripping system calibration in MATLAB}
+    \label{fig:matlab_gui}
+\end{figure}
+
+% =========================
+% 8) Conclusion
+% =========================
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this project, a signal conditioning system for slip detection in two‑jaw robotic grippers was successfully designed and evaluated. By using a piezoelectric sensor and carefully designing instrumentation amplifier stages and active and passive filters, we were able to amplify the weak millivolt‑level slip signals to a standard level.
+
+\textbf{Strengths of the design:}
+The use of JFET‑input amplifiers and the notch filter significantly improved the signal‑to‑noise ratio (SNR) and eliminated the detrimental 50 Hz mains hum. Furthermore, system‑level modelling in MATLAB allowed an accurate evaluation of the slip detection algorithm, software calibration, and the implementation of a user interface in a practical and comprehensive manner.
+
+\textbf{Weaknesses and limitations:}
+The gain loss in the passive filter stages necessitated additional amplification stages, which slightly increases the hardware footprint. The simulations also showed that for accurate reconstruction and processing of the high‑frequency components of the slip signal, high‑speed ADCs and fast processors are required. Overall, this design provides an excellent theoretical and software platform for implementing a smart and safe robotic gripper in industry.
+
+% =========================
+% References and appendices
+% =========================
+\section{References and appendices}
+\label{sec:ref_and_appx}
+
+\textbf{Note:}
+ The technical terms and concepts used throughout this report are derived from the course material of the \emph{Sensing, Instrumentation \& Measurement Systems - Prof. Jahed} course .
+
+\end{document}

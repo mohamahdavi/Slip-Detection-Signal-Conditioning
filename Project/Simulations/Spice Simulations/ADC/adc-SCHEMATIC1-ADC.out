@@ -1,0 +1,358 @@
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "adc-SCHEMATIC1-ADC.sim.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Program Files\Orcad\PSpice\PSpice.ini file:
+.lib "nom.lib" 
+
+*Analysis directives: 
+.TRAN  0 10ms 0 10u 
+.PROBE V(*) I(*) W(*) D(*) NOISE(*) 
+.INC ".\adc-SCHEMATIC1.net" 
+
+
+
+**** INCLUDING adc-SCHEMATIC1.net ****
+* source ADC
+V_V5         N06901 0 2.2
+V_V2         N00183 0 5
+R_R1         N00206 N00183  3k  
+R_R3         N07919 N00183  10k  
+R_R2         0 N00206  2k  
+R_R4         N07981 0  10k  
+X_U2         N00206 N06901 0 N05848 N07919 N07981 
++ M_UN0001 M_UN0002 M_UN0003 M_UN0004 M_UN0005 M_UN0006 M_UN0007 M_UN0008
++  M_UN0009 M_UN0010 $G_DPWR $G_DGND ADC10break 
++PARAMS:  MNTYMXDLY=0 IO_LEVEL=0
+V_V3         N00771 0  
++SIN 0 50m 100 0 0 0
+V_V8         N05848 0  
++PULSE 0 5 0 1n 1n 10u 200u
+V_V4         N00736 N00771  
++SIN 0 50m 800 0 0 0
+C_C1         N00736 N00206  100u  
+
+**** RESUMING adc-SCHEMATIC1-ADC.sim.cir ****
+.END
+
+
+**** Generated AtoD and DtoA Interfaces ****
+
+*
+* Analog/Digital interface for node N07919
+*
+* Moving X_U2.U1:STATUS from analog node N07919 to new digital node N07919$DtoA
+X$N07919_DtoA1
++ N07919$DtoA
++ N07919
++ $G_DPWR
++ $G_DGND
++ DtoA_STD
++       PARAMS: DRVH=  96.4   DRVL= 104    CAPACITANCE=   0     
+*
+* Analog/Digital interface for node N07981
+*
+* Moving X_U2.U1:OVRNG from analog node N07981 to new digital node N07981$DtoA
+X$N07981_DtoA1
++ N07981$DtoA
++ N07981
++ $G_DPWR
++ $G_DGND
++ DtoA_STD
++       PARAMS: DRVH=  96.4   DRVL= 104    CAPACITANCE=   0     
+*
+* Analog/Digital interface for node N05848
+*
+* Moving X_U2.U1:CONVERT from analog node N05848 to new digital node N05848$AtoD
+X$N05848_AtoD1
++ N05848
++ N05848$AtoD
++ $G_DPWR
++ $G_DGND
++ AtoD_STD
++       PARAMS: CAPACITANCE=   0     
+*
+* Analog/Digital interface power supply subcircuits
+*
+
+X$DIGIFPWR 0 DIGIFPWR
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     Diode MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               D74CLMP         D74             
+          IS    1.000000E-15  100.000000E-18 
+          RS    2              25            
+         CJO    2.000000E-12    2.000000E-12 
+
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     BJT MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               Q74             
+               NPN             
+          IS  100.000000E-18 
+          BF   49            
+          NF    1            
+         ISE  100.000000E-18 
+          BR     .03         
+          NR    1            
+         ISC  400.000000E-18 
+          RB   50            
+          RC   20            
+         CJE    1.000000E-12 
+         VJE     .9          
+         MJE     .5          
+         CJC  500.000000E-15 
+         VJC     .8          
+         CJS    3.000000E-12 
+         VJS     .7          
+         MJS     .33         
+          TF  200.000000E-12 
+          TR   10.000000E-09 
+          CN    2.42         
+           D     .87         
+
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     Digital Input MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               DIN74           
+        FILE DSO_DTOA        
+      FORMAT    6            
+    TIMESTEP  100.000000E-12 
+      S0NAME 0               
+       S0TSW    3.500000E-09 
+       S0RLO    7.13         
+       S0RHI  389            
+      S1NAME 1               
+       S1TSW    5.500000E-09 
+       S1RLO  467            
+       S1RHI  200            
+      S2NAME X               
+       S2TSW    3.500000E-09 
+       S2RLO   42.9          
+       S2RHI  116            
+      S3NAME R               
+       S3TSW    3.500000E-09 
+       S3RLO   42.9          
+       S3RHI  116            
+      S4NAME F               
+       S4TSW    3.500000E-09 
+       S4RLO   42.9          
+       S4RHI  116            
+      S5NAME Z               
+       S5TSW    3.500000E-09 
+       S5RLO  200.000000E+03 
+       S5RHI  200.000000E+03 
+
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     Digital Output MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               DO74            
+        FILE DSO_ATOD        
+      FORMAT    6            
+     CHGONLY    1            
+    TIMESTEP  100.000000E-12 
+      S0NAME X               
+       S0VHI    2            
+       S0VLO     .8          
+      S1NAME 0               
+       S1VHI     .8          
+       S1VLO   -1.5          
+      S2NAME R               
+       S2VHI    1.4          
+       S2VLO     .8          
+      S3NAME R               
+       S3VHI    2            
+       S3VLO    1.3          
+      S4NAME X               
+       S4VHI    2            
+       S4VLO     .8          
+      S5NAME 1               
+       S5VHI    7            
+       S5VLO    2            
+      S6NAME F               
+       S6VHI    2            
+       S6VLO    1.3          
+      S7NAME F               
+       S7VHI    1.4          
+       S7VLO     .8          
+
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     Analog to Digital Converter MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U2.ADC10_TIMING 
+      TPCSMN    0            
+      TPCSTY    0            
+      TPCSMX    0            
+      TPSDMN    0            
+      TPSDTY    0            
+      TPSDMX    0            
+      TPDSMN    0            
+      TPDSTY    0            
+      TPDSMX    0            
+
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     Digital IO  MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               IO_STD          
+        DRVL  104            
+        DRVH   96.4          
+       AtoD1 AtoD_STD        
+       AtoD2 AtoD_STD_NX     
+       AtoD3 AtoD_STD        
+       AtoD4 AtoD_STD_NX     
+       DtoA1 DtoA_STD        
+       DtoA2 DtoA_STD        
+       DtoA3 DtoA_STD        
+       DtoA4 DtoA_STD        
+      TSWHL1    1.511000E-09 
+      TSWHL2    1.487000E-09 
+      TSWHL3    1.511000E-09 
+      TSWHL4    1.487000E-09 
+      TSWLH1    3.517000E-09 
+      TSWLH2    3.564000E-09 
+      TSWLH3    3.517000E-09 
+      TSWLH4    3.564000E-09 
+       TPWRT  100.000000E+03 
+
+
+**** 02/20/26 16:22:53 ********* PSpice 9.2 (Mar 2000) ******** ID# 1 ********
+
+ ** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ]
+
+
+ ****     INITIAL TRANSIENT SOLUTION       TEMPERATURE =   27.000 DEG C
+
+
+******************************************************************************
+
+
+
+ NODE   VOLTAGE     NODE   VOLTAGE     NODE   VOLTAGE     NODE   VOLTAGE
+
+
+(N00183)    5.0000 (N00206)    2.0000 (N00736)    0.0000 (N00771)    0.0000     
+
+(N05848)    0.0000 (N06901)    2.2000 (N07919)     .0934 (N07981)    1.3457     
+
+($G_DGND)    0.0000                   ($G_DPWR)    5.0000                       
+
+(X$N05848_AtoD1.1)     .0915          (X$N05848_AtoD1.2)     .0457              
+
+(X$N05848_AtoD1.3)     .8277          
+
+
+
+ DGTL NODE : STATE  DGTL NODE : STATE  DGTL NODE : STATE  DGTL NODE : STATE
+
+
+(M_UN0006) : X     (M_UN0003) : X     (M_UN0010) : X     (M_UN0007) : X         
+
+(N07919$DtoA) : 0  (M_UN0004) : X     (M_UN0001) : X     (N05848$AtoD) : 0      
+
+(M_UN0008) : X     (N07981$DtoA) : X  (M_UN0005) : X     (M_UN0002) : X         
+
+(M_UN0009) : X     
+
+
+
+
+    VOLTAGE SOURCE CURRENTS
+    NAME         CURRENT
+
+    V_V5        -2.200E-12
+    V_V2        -1.491E-03
+    V_V3         0.000E+00
+    V_V8         1.043E-03
+    V_V4         0.000E+00
+    X$DIGIFPWR.VDPWR  -4.516E-02
+    X$DIGIFPWR.VDGND  -6.920E-04
+
+    TOTAL POWER DISSIPATION   2.33E-01  WATTS
+
+
+
+          JOB CONCLUDED
+
+          TOTAL JOB TIME             .36
+

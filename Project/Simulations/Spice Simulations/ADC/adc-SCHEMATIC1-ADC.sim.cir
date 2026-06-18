@@ -1,0 +1,17 @@
+** Profile: "SCHEMATIC1-ADC"  [ D:\Educational\Electricite\7\Sensing and Measurment\Project\Simulations\ADC\adc-SCHEMATIC1-ADC.sim ] 
+
+** Creating circuit file "adc-SCHEMATIC1-ADC.sim.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Program Files\Orcad\PSpice\PSpice.ini file:
+.lib "nom.lib" 
+
+*Analysis directives: 
+.TRAN  0 10ms 0 10u 
+.PROBE V(*) I(*) W(*) D(*) NOISE(*) 
+.INC ".\adc-SCHEMATIC1.net" 
+
+
+.END
