@@ -9,7 +9,6 @@ The goal is to design and simulate an analog signal conditioning circuit that pr
 - **`slip_detection_report.pdf`** – Full project report (English) with all derivations, figures, and results.
 - **`slip_detection_report.tex`** – LaTeX source of the report.
 - **Figure files** – All images used in the report (schematic, simulation waveforms, frequency response, MATLAB GUI).
-- **Future additions** – MATLAB code, LTspice schematic files, and additional phases can be uploaded later.
 
 ## Key Topics
 - Piezoelectric sensor modelling
