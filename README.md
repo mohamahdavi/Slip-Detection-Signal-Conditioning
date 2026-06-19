@@ -1,6 +1,6 @@
 # Signal Conditioning System for Slip Detection in a Two‑Jaw Robotic Gripper
 
-This repository contains the work for a project in the **Sensing, Instrumentation & Measurement Systems** course.
+This repository contains the work for a project in the **Sensing, Instrumentation & Measurement Systems** course, Electrical Engineering Department, Sharif University of Technology.
 
 ## Overview
 The goal is to design and simulate an analog signal conditioning circuit that processes the output of a piezoelectric sensor to detect slip during robotic grasping. The system amplifies weak millivolt signals, filters out noise (including 50 Hz mains hum), and prepares the signal for analog‑to‑digital conversion. The circuit is simulated in LTspice, and the complete signal chain is modelled in MATLAB with a graphical user interface for calibration and monitoring.
@@ -25,10 +25,15 @@ The goal is to design and simulate an analog signal conditioning circuit that pr
 - **MATLAB** – System modelling, slip detection algorithm, GUI
 - **LaTeX** – Report writing
 
+
+## Course Details
+- **Course:** Sensing, Instrumentation & Measurement Systems (25769)
+- **Instructor:** Prof. Mehran Jahed  
+- **Date:** February 2026 
+
 ## Authors
 - Mohammad Mahdi Barzegar
 - Mohammad Reza Mahdavi
 - Mohammad Moein Abolfathi
 
-Course: Sensing, Instrumentation & Measurement Systems - Prof. Jahed - Electrical Engineering Department, Sharif University of Technology
-Date: February 2026
+*Status: Completed*
